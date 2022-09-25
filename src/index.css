@@ -192,3 +192,27 @@ a.button {
 .img-container-login{
   width: 30%;
 }
+
+.alert-div{
+
+  text-align: center;
+  margin: 7px;
+  background: #8ed9e1;
+  padding: 5px;
+  border-radius: 7px;
+
+}
+
+.text-center{
+  text-align: center;
+}
+
+.message-error{
+    font-size: smaller;
+    text-align: center;
+    color: red;
+}
+
+.touch{
+  cursor: pointer; 
+}

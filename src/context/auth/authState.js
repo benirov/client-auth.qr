@@ -10,7 +10,11 @@ import {
     LOGIN_CLOSE,
     AUTENTICATE_USER,
     AUTENTICATE_USER_ERROR,
-    CLEAN_ALERT,
+    SET_SOCKECT,
+    CLEAR_ALERT,
+    SET_INFO_PERMISSION,
+    SET_INFO_PERMISSION_ERROR,
+    SET_AUTORIZATE
 } from './../../types';
 
 import axiosClient from '../../config/axios';
@@ -21,10 +25,12 @@ const AutState = ({children}) => {
     //definir state
     const initialState = {
         token : typeof window !== 'undefined' ? localStorage.getItem("token") : '',
-        authenticate: null,
         user: null,
-        message: null,
-        type: 'success'
+        message: '',
+        authorized: false,
+        sockect: '',
+        authenticate: null,
+        infopermission: null,
     }
 
     //definir reducer
@@ -34,7 +40,7 @@ const AutState = ({children}) => {
 
     const userRegister = async data => {
         try {
-             const resultado = await axiosClient.post('/api/signup', data);
+             const resultado = await axiosClient.post('/api/users', data);
              dispatch({
                 type: REGISTER_SUCCESS,
                 payload: resultado.data
@@ -50,17 +56,17 @@ const AutState = ({children}) => {
 
         setTimeout(() => {
             dispatch({
-                type: CLEAN_ALERT,
+                type: CLEAR_ALERT,
                 payload: null
             });
             
-        }, 5000);
+        }, 3000);
     }
 
     const loginUser  = async datos => {
 
         try {
-            const resultado = await axiosClient.post('/api/signin', datos);
+            const resultado = await axiosClient.post('/api/auth', datos);
 
             dispatch({
                type: LOGIN_SUCCESS,
@@ -75,13 +81,46 @@ const AutState = ({children}) => {
            
        }
 
-       setTimeout(() => {
+    }
+
+    const getInfoPermission  = async id => {
+
+        try {
+            const resultado = await axiosClient.get(`/api/sockect/${id}`);
+
+            dispatch({
+               type: SET_INFO_PERMISSION,
+               payload: resultado.data.data
+           });
+
+       } catch (error) {
            dispatch({
-               type: CLEAN_ALERT,
-               payload: null
+               type: SET_INFO_PERMISSION_ERROR,
+               payload: error.response.data.message
            });
            
-       }, 3000);
+       }
+
+    }
+
+    const setPermission  = async id => {
+
+        try {
+            const token = localStorage.getItem("token");
+            if(token) tokenAuth(token);
+            const resultado = await axiosClient.post(`/api/sockect`, {sockectId: id});
+
+            dispatch({
+                type: LOGIN_SUCCESS,
+                payload: resultado.data
+            });
+
+       } catch (error) {
+            dispatch({
+                type: LOGIN_ERROR,
+                payload: error.response.data.message
+            });
+       }
 
     }
 
@@ -93,7 +132,7 @@ const AutState = ({children}) => {
         if(token) tokenAuth(token);
 
         try {
-            const resultado = await axiosClient.get('/api/userAutenticate');
+            const resultado = await axiosClient.get('/api/auth');
             if(resultado.data){
                 dispatch({
                     type: AUTENTICATE_USER,
@@ -104,7 +143,7 @@ const AutState = ({children}) => {
        } catch (error) {
            dispatch({
                type: AUTENTICATE_USER_ERROR,
-               payload: error.response.data.msg
+               payload: error.response.data.message
            });
            
        }
@@ -118,6 +157,22 @@ const AutState = ({children}) => {
         });
     }
 
+    const setSockect = async(id) => {
+
+        dispatch({
+            type: SET_SOCKECT,
+            payload: id
+        });
+    }
+
+    const userAuthorized = async() => {
+
+        dispatch({
+            type: SET_AUTORIZATE,
+        });
+    }
+    
+
 
     return (
         <authContext.Provider
@@ -125,12 +180,18 @@ const AutState = ({children}) => {
                 token: state.token,
                 authenticate: state.authenticate,
                 user: state.user,
+                sockect:state.sockect,
                 message: state.message,
-                type: state.type,
+                infopermission: state.infopermission,
+                authorized: state.authorized,
+                userAuthorized,
                 userRegister,
                 loginUser,
                 autenticateUser,
-                loginClose
+                loginClose,
+                setSockect,
+                getInfoPermission,
+                setPermission
             }}
          >
              {children}

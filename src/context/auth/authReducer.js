@@ -6,7 +6,11 @@ import {
     LOGIN_CLOSE,
     AUTENTICATE_USER,
     AUTENTICATE_USER_ERROR,
-    CLEAN_ALERT,
+    SET_SOCKECT,
+    SET_INFO_PERMISSION,
+    SET_INFO_PERMISSION_ERROR,
+    CLEAR_ALERT,
+    SET_AUTORIZATE
 } from './../../types';
 
 
@@ -40,6 +44,12 @@ export default ( state, action) => {
                 authenticate: false,
                 type: 'danger'
             }
+
+        case CLEAR_ALERT:
+            return {
+                ...state,
+                message: '',
+        }
         case LOGIN_CLOSE:
             localStorage.removeItem("token");
             return {
@@ -61,11 +71,31 @@ export default ( state, action) => {
                 user: null,
                 authenticate: false,
             }
-        case CLEAN_ALERT:
+
+        case SET_AUTORIZATE:
             return {
                 ...state,
-                message: action.payload,
+                authorized: true,
             }
+
+        case SET_SOCKECT:
+            return {
+                ...state,
+                sockect: action.payload,
+            }
+
+        case SET_INFO_PERMISSION:
+            return {
+                ...state,
+                infopermission: action.payload,
+            }
+
+        case SET_INFO_PERMISSION_ERROR:
+            return {
+                ...state,
+                infopermission: null,
+            }
+            
             
         default:
             return state;
